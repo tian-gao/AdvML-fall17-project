@@ -1,0 +1,9 @@
+# auxiliary
+.DS_Store
+*.pyc
+__pycache__/
+.ipynb_checkpoints/
+
+# specific files
+*.sh
+*.ipynb
