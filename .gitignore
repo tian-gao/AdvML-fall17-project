@@ -4,6 +4,10 @@
 __pycache__/
 .ipynb_checkpoints/
 
+# latex
+*.aux
+*.bbl
+
 # specific files
 *.sh
 *.ipynb
