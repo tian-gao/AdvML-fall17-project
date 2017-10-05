@@ -75,7 +75,7 @@
 \def\maketitle{%
     \thispagestyle{empty}
     \begin{center}
-        \vspace*{2em}
+        \vspace*{4em}
         \LARGE{\bf\@title} \\ [2em]
         \Large{\@subtitle} \\ [4em]
 

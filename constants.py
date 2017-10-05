@@ -1,11 +1,3 @@
-# path
-PATH_INPUT_STYLE = 'input/style/'
-PATH_INPUT_CONTENT = 'input/content/'
-PATH_OUTPUT = 'output/'
-
-# pre-trained network data
-TRAINED_NETWORK_DATA = 'imagenet-vgg-verydeep-19.mat'
-
 # VGG layder definition
 VGG19_LAYERS = (
     'conv1_1', 'relu1_1', 'conv1_2', 'relu1_2', 'pool1',
