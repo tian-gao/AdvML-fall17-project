@@ -17,7 +17,7 @@ from neural_network import NeuralNetwork
 
 def style_transfer(
         content_name, style_name, output_name, content_weight, style_weight, tv_weight,
-        pooling, learning_rate, beta1, beta2, epsilon, max_iteration):
+        pooling, learning_rate, beta1, beta2, epsilon, max_iteration, check_point):
     time_start = time.time()
 
     # read images
@@ -30,8 +30,10 @@ def style_transfer(
     nn = NeuralNetwork(content, style, vgg, content_weight, style_weight, tv_weight)
 
     # train model
-    output_image = nn.train_model(learning_rate, beta1, beta2, epsilon, max_iteration)
-    save_image(output_image, PATH_OUTPUT + output_name)
+    for k, output_image in nn.train_model(learning_rate, beta1, beta2, epsilon, max_iteration, check_point):
+        name_list = output_name.split('.')
+        image_name = PATH_OUTPUT + '.'.join(name_list[:-1]) + '_{}.{}'.format(str(k) if k >= 0 else 'final', name_list[-1])
+        save_image(output_image, image_name)
 
     time_end = time.time()
     logger.info('Time elapsed: {} seconds'.format(round(time_end - time_start)))
@@ -40,11 +42,11 @@ def style_transfer(
 def build_parser():
     parser = ArgumentParser()
     parser.add_argument('--content', dest='content', required=True,
-                        help='Content image specified with name.format; e.g. "input.jpg"')
+                        help='Content image, e.g. "input.jpg"')
     parser.add_argument('--style', dest='style', required=True,
-                        help='Style image specified with name.format; e.g. "style.jpg"')
+                        help='Style image, e.g. "style.jpg"')
     parser.add_argument('--output', dest='output', required=True,
-                        help='Output image specified with name.format; e.g. "output.jpg"')
+                        help='Output image, e.g. "output.jpg"')
     return parser
 
 
@@ -71,5 +73,6 @@ if __name__ == '__main__':
         beta1=BETA1,
         beta2=BETA2,
         epsilon=EPSILON,
-        max_iteration=MAX_ITERATION
+        max_iteration=MAX_ITERATION,
+        check_point=MAX_ITERATION / 10
     )

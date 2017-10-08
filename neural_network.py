@@ -77,7 +77,7 @@ class NeuralNetwork(object):
 
         return style_features
 
-    def train_model(self, learning_rate, beta1, beta2, epsilon, max_iteration):
+    def train_model(self, learning_rate, beta1, beta2, epsilon, max_iteration, check_point):
         with tf.Graph().as_default():
             # initialize with random guess
             logger.info('Initializing tensorflow graph with random guess......')
@@ -105,12 +105,11 @@ class NeuralNetwork(object):
                     logger.info('Iteration {} total loss {}'.format(str(k+1), loss.eval()))
                     train_step.run()
 
-                # form output image
-                output_temp = input_image.eval()
-                output_image = unprocess_image(output_temp.reshape(self.content_shape[1:]), self.vgg.mean_pixel)
-
-                # yield output_image
-                return output_image
+                    # save intermediate images at checkpoints
+                    if (check_point and (not k % check_point)) or k == max_iteration - 1:
+                        output_temp = input_image.eval()
+                        output_image = unprocess_image(output_temp.reshape(self.content_shape[1:]), self.vgg.mean_pixel)
+                        yield k, output_image
 
     def _calculate_content_loss(self, parsed_net):
         logger.info('Calculating content loss......')

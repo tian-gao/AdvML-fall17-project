@@ -49,8 +49,8 @@
 %% Header & Footer
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small{\@title}}
-\fancyhead[R]{\small{\@subtitle}}
+\fancyhead[L]{\small{\@title \\ \@subtitle}}
+\fancyhead[R]{Tian Gao \\ tg2585}
 \fancyfoot[C]{\thepage}
 \setlength{\headsep}{0.5em}
 
@@ -79,11 +79,6 @@
         \LARGE{\bf\@title} \\ [2em]
         \Large{\@subtitle} \\ [4em]
 
-        \begin{center} \normalsize
-            \textbf{Tian Gao} \\
-            \textit{tg2585} \\
-            \texttt{tian.gao@columbia.edu} \\ [3em]
-        \end{center}
         \begin{center} \normalsize
             \textbf{Tian Gao} \\
             \textit{tg2585} \\
