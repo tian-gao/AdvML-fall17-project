@@ -32,7 +32,7 @@ def style_transfer(
     # train model
     for k, output_image in nn.train_model(learning_rate, beta1, beta2, epsilon, max_iteration, check_point):
         name_list = output_name.split('.')
-        image_name = PATH_OUTPUT + '.'.join(name_list[:-1]) + '_{}.{}'.format(str(k) if k >= 0 else 'final', name_list[-1])
+        image_name = PATH_OUTPUT + '.'.join(name_list[:-1]) + '_{}.{}'.format(str(k) if not k % check_point else 'final', name_list[-1])
         save_image(output_image, image_name)
 
     time_end = time.time()

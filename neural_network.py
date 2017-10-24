@@ -92,11 +92,20 @@ class NeuralNetwork(object):
             tv_loss = self._calculate_tv_loss(input_image)
             loss = content_loss + style_loss + tv_loss
 
+            # summary statistics
+            tf.summary.scalar('content_loss', content_loss)
+            tf.summary.scalar('style_loss', style_loss)
+            tf.summary.scalar('tv_loss', tv_loss)
+            tf.summary.scalar('total_loss', loss)
+            summary_loss = tf.summary.merge_all()
+
             # initialize optimization
             train_step = tf.train.AdamOptimizer(learning_rate, beta1, beta2, epsilon).minimize(loss)
-            best_loss = float('inf')
 
             with tf.Session() as session:
+                summary_writer = tf.summary.FileWriter('logs/neural_network', session.graph)
+                logger.info('Saving graph......')
+
                 session.run(tf.global_variables_initializer())
                 logger.info('Initializing optimization......')
                 logger.info('Current total loss: {}'.format(loss.eval()))
@@ -104,6 +113,8 @@ class NeuralNetwork(object):
                 for k in range(max_iteration):
                     logger.info('Iteration {} total loss {}'.format(str(k+1), loss.eval()))
                     train_step.run()
+                    summary = session.run(summary_loss)
+                    summary_writer.add_summary(summary, k)
 
                     # save intermediate images at checkpoints
                     if (check_point and (not k % check_point)) or k == max_iteration - 1:
