@@ -13,4 +13,4 @@ figs/
 *.sh
 *.ipynb
 *.mat
-output/
+intermediate/
