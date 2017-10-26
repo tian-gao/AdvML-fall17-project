@@ -6,8 +6,336 @@
 
 \begin{spacing}{1.2}
 \section{style\_transfer.py}
-\label{sec:code:style_transfer}
+\label{sec:code:st}
 \begin{lstlisting}
-# here is code
+import os
+import sys
+import time
+import scipy.misc
+from argparse import ArgumentParser
+from utils import read_image, save_image
+
+from logger import logger
+from settings import PATH_INPUT_STYLE, PATH_INPUT_CONTENT, PATH_OUTPUT, TRAINED_NETWORK_DATA
+from constants import (
+    CONTENT_WEIGHT, STYLE_WEIGHT, TV_WEIGHT, POOLING,
+    LEARNING_RATE, BETA1, BETA2, EPSILON, MAX_ITERATION
+)
+from visual_geometry_group import VGG
+from neural_network import NeuralNetwork
+
+
+def style_transfer(
+        content_name, style_name, output_name, content_weight, style_weight, tv_weight,
+        pooling, learning_rate, beta1, beta2, epsilon, max_iteration, check_point):
+    time_start = time.time()
+
+    # read images
+    content = read_image(PATH_INPUT_CONTENT + content_name)
+    style = read_image(PATH_INPUT_STYLE + style_name)
+    style = scipy.misc.imresize(style, content.shape[1] / style.shape[1])
+
+    # initialize objects
+    vgg = VGG(TRAINED_NETWORK_DATA, pooling)
+    nn = NeuralNetwork(content, style, vgg, content_weight, style_weight, tv_weight)
+
+    # train model
+    for k, output_image in nn.train_model(learning_rate, beta1, beta2, epsilon, max_iteration, check_point):
+        name_list = output_name.split('.')
+        image_name = PATH_OUTPUT + '.'.join(name_list[:-1]) + '_{}.{}'.format(str(k) if not k % check_point else 'final', name_list[-1])
+        save_image(output_image, image_name)
+
+    time_end = time.time()
+    logger.info('Time elapsed: {} seconds'.format(round(time_end - time_start)))
+
+
+def build_parser():
+    parser = ArgumentParser()
+    parser.add_argument('--content', dest='content', required=True,
+                        help='Content image, e.g. "input.jpg"')
+    parser.add_argument('--style', dest='style', required=True,
+                        help='Style image, e.g. "style.jpg"')
+    parser.add_argument('--output', dest='output', required=True,
+                        help='Output image, e.g. "output.jpg"')
+    return parser
+
+
+if __name__ == '__main__':
+    parser = build_parser()
+    args = parser.parse_args()
+
+    # check if network data file exists
+    if not os.path.isfile(TRAINED_NETWORK_DATA):
+        logger.error('Cannot find pre-trained network data file!')
+        sys.exit()
+
+    style_transfer(
+        content_name=args.content,
+        style_name=args.style,
+        output_name=args.output,
+
+        content_weight=CONTENT_WEIGHT,
+        style_weight=STYLE_WEIGHT,
+        tv_weight=TV_WEIGHT,
+        pooling=POOLING,
+
+        learning_rate=LEARNING_RATE,
+        beta1=BETA1,
+        beta2=BETA2,
+        epsilon=EPSILON,
+        max_iteration=MAX_ITERATION,
+        check_point=MAX_ITERATION / 10
+    )
+
+\end{lstlisting}
+\end{spacing}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\begin{spacing}{1.2}
+\section{neural\_network.py}
+\label{sec:code:nn}
+\begin{lstlisting}
+import numpy as np
+import tensorflow as tf
+from functools import reduce
+from operator import mul
+
+from logger import logger
+from constants import CONTENT_LAYERS, STYLE_LAYERS
+from utils import process_image, unprocess_image
+
+
+class NeuralNetwork(object):
+    """NeuralNetwork provides an interface to formulate the Tensorflow neural network model
+    and perform style transfer algorithm"""
+    def __init__(self, content, style, vgg, content_weight, style_weight, tv_weight):
+        logger.info('Initializing neural network......')
+        self.content = content
+        self.style = style
+        self.vgg = vgg
+
+        self.content_weight = content_weight
+        self.style_weight = style_weight
+        self.tv_weight = tv_weight
+
+        self.content_shape, self.style_shape, self.content_layer_weights, self.style_layer_weights = self.get_parameters()
+        self.content_features, self.style_features = self.get_features()
+
+    def get_parameters(self):
+        logger.info('Fetching images parameters......')
+        content_shape = (1, ) + self.content.shape
+        style_shape = (1, ) + self.style.shape
+
+        # get content layer weights
+        content_layer_weights = {}
+        content_layer_weights['relu4_2'] = 1.0
+        content_layer_weights['relu5_2'] = 0.0
+
+        # get style layer weights
+        style_layer_weights = {}
+        for style_layer in STYLE_LAYERS:
+            style_layer_weights[style_layer] = 1.0 / len(STYLE_LAYERS)
+
+        return content_shape, style_shape, content_layer_weights, style_layer_weights
+
+    def get_features(self):
+        content_features = self._get_content_feature()
+        style_features = self._get_style_feature()
+        return content_features, style_features
+
+    def _get_content_feature(self):
+        logger.info('Fetching content features......')
+        content_features = {}
+        graph = tf.Graph()
+        with graph.as_default(), graph.device('/cpu:0'), tf.Session() as session:
+            content_image = tf.placeholder('float', shape=self.content_shape)
+            content_net = self.vgg.load_net(content_image)
+            content_pre = np.array([
+                process_image(self.content, self.vgg.mean_pixel)])
+            for content_layer in CONTENT_LAYERS:
+                content_features[content_layer] = content_net[content_layer].eval(feed_dict={content_image: content_pre})
+
+        return content_features
+
+    def _get_style_feature(self):
+        logger.info('Fetching style features......')
+        style_features = {}
+        graph = tf.Graph()
+        with graph.as_default(), graph.device('/cpu:0'), tf.Session() as session:
+            style_image = tf.placeholder('float', shape=self.style_shape)
+            style_net = self.vgg.load_net(style_image)
+            style_pre = np.array([
+                process_image(self.style, self.vgg.mean_pixel)])
+            for style_layer in STYLE_LAYERS:
+                feature = style_net[style_layer].eval(feed_dict={style_image: style_pre})
+                feature = np.reshape(feature, (-1, feature.shape[3]))
+                gram = feature.T.dot(feature) / feature.size
+                style_features[style_layer] = gram
+
+        return style_features
+
+    def train_model(self, learning_rate, beta1, beta2, epsilon, max_iteration, check_point):
+        with tf.Graph().as_default():
+            # initialize with random guess
+            logger.info('Initializing tensorflow graph with random guess......')
+            noise = np.random.normal(size=self.content_shape, scale=np.std(self.content) * 0.1)
+            initial_guess = tf.random_normal(self.content_shape) * 0.256
+            input_image = tf.Variable(initial_guess)
+            parsed_net = self.vgg.load_net(input_image)
+
+            # calculate loss
+            content_loss = self._calculate_content_loss(parsed_net)
+            style_loss = self._calculate_style_loss(parsed_net)
+            tv_loss = self._calculate_tv_loss(input_image)
+            loss = content_loss + style_loss + tv_loss
+
+            # summary statistics
+            tf.summary.scalar('content_loss', content_loss)
+            tf.summary.scalar('style_loss', style_loss)
+            tf.summary.scalar('tv_loss', tv_loss)
+            tf.summary.scalar('total_loss', loss)
+            summary_loss = tf.summary.merge_all()
+
+            # initialize optimization
+            train_step = tf.train.AdamOptimizer(learning_rate, beta1, beta2, epsilon).minimize(loss)
+
+            with tf.Session() as session:
+                summary_writer = tf.summary.FileWriter('logs/neural_network', session.graph)
+                logger.info('Saving graph......')
+
+                session.run(tf.global_variables_initializer())
+                logger.info('Initializing optimization......')
+                logger.info('Current total loss: {}'.format(loss.eval()))
+
+                for k in range(max_iteration):
+                    logger.info('Iteration {} total loss {}'.format(str(k+1), loss.eval()))
+                    train_step.run()
+                    summary = session.run(summary_loss)
+                    summary_writer.add_summary(summary, k)
+
+                    # save intermediate images at checkpoints
+                    if (check_point and (not k % check_point)) or k == max_iteration - 1:
+                        output_temp = input_image.eval()
+                        output_image = unprocess_image(output_temp.reshape(self.content_shape[1:]), self.vgg.mean_pixel)
+                        yield k, output_image
+
+    def _calculate_content_loss(self, parsed_net):
+        logger.info('Calculating content loss......')
+        losses = []
+        for content_layer in CONTENT_LAYERS:
+            losses += [
+                self.content_layer_weights[content_layer] * self.content_weight * (
+                    2 * tf.nn.l2_loss(
+                        parsed_net[content_layer] - self.content_features[content_layer]
+                    ) / self.content_features[content_layer].size)]
+        return reduce(tf.add, losses)
+
+    def _calculate_style_loss(self, parsed_net):
+        logger.info('Calculating style loss......')
+        losses = []
+        for style_layer in STYLE_LAYERS:
+            layer = parsed_net[style_layer]
+            _, height, width, number = map(lambda x: x.value, layer.get_shape())
+            size = height * width * number
+            feats = tf.reshape(layer, (-1, number))
+            gram = tf.matmul(tf.transpose(feats), feats) / size
+            style_gram = self.style_features[style_layer]
+            losses += [
+                self.style_layer_weights[style_layer] * 2 * tf.nn.l2_loss(gram - style_gram) / style_gram.size]
+        return self.style_weight * reduce(tf.add, losses)
+
+    def _calculate_tv_loss(self, image):
+        # total variation denoising
+        logger.info('Calculating total variation loss......')
+        tv_y_size = self._get_tensor_size(image[:, 1:, :, :])
+        tv_x_size = self._get_tensor_size(image[:, :, 1:, :])
+        tv_loss = self.tv_weight * 2 * ((
+            tf.nn.l2_loss(image[:, 1:, :, :] - image[:, :self.content_shape[1]-1, :, :]) / tv_y_size) + (
+            tf.nn.l2_loss(image[:, :, 1:, :] - image[:, :, :self.content_shape[2]-1, :]) / tv_x_size))
+        return tv_loss
+
+    def _get_tensor_size(self, tensor):
+        return reduce(mul, (d.value for d in tensor.get_shape()), 1)
+
+\end{lstlisting}
+\end{spacing}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\begin{spacing}{1.2}
+\section{visual\_geometry\_group.py}
+\label{sec:code:vgg}
+\begin{lstlisting}
+import numpy as np
+import scipy.io
+import tensorflow as tf
+
+from logger import logger
+from constants import VGG19_LAYERS
+
+
+class VGG(object):
+    """VGG provides an interface to extract parameter from pre-trained neural network
+    and formulate Tensorflow layers"""
+    def __init__(self, trained, pooling):
+        logger.info('Loading pre-trained network data......')
+        self.network = scipy.io.loadmat(trained)
+        self.layers, self.mean_pixel = self.init_net()
+        self.pooling = pooling
+
+    def init_net(self):
+        mean_mat = self.network['normalization'][0][0][0]  # shape: (224, 224, 3)
+        mean_pixel = np.mean(mean_mat, axis=(0, 1))  # length: 3
+        layers = self.network['layers'].reshape(-1)  # length: 43
+        return layers, mean_pixel
+
+    def load_net(self, input_image):
+        # construct layers using parameters
+        logger.info('Parsing layers......')
+        parsed_net = {}
+        current_image = input_image
+
+        for layer_name, input_layer in zip(VGG19_LAYERS, self.layers):
+            layer_kind = layer_name[:4]
+
+            if layer_kind == 'conv':
+                current_image = self._get_conv_layer(current_image, input_layer)
+            elif layer_kind == 'relu':
+                current_image = self._get_relu_layer(current_image)
+            elif layer_kind == 'pool':
+                current_image = self._get_pool_layer(current_image)
+            parsed_net[layer_name] = current_image
+
+        assert len(parsed_net) == len(VGG19_LAYERS)
+        return parsed_net
+
+    def _get_conv_layer(self, input_image, input_layer):
+        # get kernel and bias
+        # matconvnet: weights are [width, height, in_channels, out_channels]
+        # tensorflow: weights are [height, width, in_channels, out_channels]
+        kernels, bias = input_layer[0][0][0][0]
+        kernels = np.transpose(kernels, (1, 0, 2, 3))
+        bias = bias.reshape(-1)
+
+        # formulate conv layer
+        conv = tf.nn.conv2d(input_image, tf.constant(kernels), strides=(1, 1, 1, 1), padding='SAME')
+        layer = tf.nn.bias_add(conv, bias)
+        return layer
+
+    def _get_relu_layer(self, input_image):
+        return tf.nn.relu(input_image)
+
+    def _get_pool_layer(self, input_image):
+        if self.pooling == 'avg':
+            layer = tf.nn.avg_pool(input_image, ksize=(1, 2, 2, 1), strides=(1, 2, 2, 1), padding='SAME')
+        elif self.pooling == 'max':
+            layer = tf.nn.max_pool(input_image, ksize=(1, 2, 2, 1), strides=(1, 2, 2, 1), padding='SAME')
+        return layer
+
 \end{lstlisting}
 \end{spacing}

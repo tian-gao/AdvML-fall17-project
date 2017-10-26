@@ -35,6 +35,7 @@
 \RequirePackage[compact]{titlesec}
 \RequirePackage{lipsum}
 \RequirePackage{setspace}
+\RequirePackage{multirow}
 
 %% Margin
 \setlength{\parindent}{0em}
@@ -77,7 +78,7 @@
     \begin{center}
         \vspace*{4em}
         \LARGE{\bf\@title} \\ [2em]
-        \Large{\@subtitle} \\ [4em]
+        \Large{\@subtitle} \\ [5em]
 
         \begin{center} \normalsize
             \textbf{Tian Gao} \\
