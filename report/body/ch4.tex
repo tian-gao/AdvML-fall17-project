@@ -58,16 +58,41 @@ As is shown from the illustration above, the initial learning rate of the algori
 and then the speed slows down; the output result has almost converged after $N=500$.
 This pattern fits the common process of other deep learning algorithms.
 
+\newpage
 \subsection{Loss convergence}
 As is pointed out in Sec.\,\ref{sec:results:vg:checkpoint},
 total loss declines rapidly at initial stage and then converges around $N = 600$.
 Fig.\,~\ref{fig:results:vg:loss} shows the loss function values at each iteration.
-The concave shape of total loss can be viewed as a proof of the finding.
+The overall concave shape of total loss can be viewed as a proof of the finding.
+
+    \begin{figure}[!hbt]
+    \center
+    \subfigure[content loss]{\includegraphics[width=0.49\textwidth]{loss/content_loss.pdf}}
+    \subfigure[style loss]{\includegraphics[width=0.49\textwidth]{loss/style_loss.pdf}}
+    \subfigure[tv loss]{\includegraphics[width=0.49\textwidth]{loss/tv_loss.pdf}}
+    \subfigure[total loss]{\includegraphics[width=0.49\textwidth]{loss/total_loss.pdf}}
+    \caption{Model training loss plot}
+    \label{fig:results:vg:loss}
+    \end{figure}
+
+Since the absolute value of the loss is not informative enough and
+scaling of the plot prevents us from viewing the loss curve in details,
+Fig.\,~\ref{fig:results:vg:logloss} presents the logarithmic loss of each type.
+Notice that the loss data is un-smoothed and thus the plots have rugged shapes.
+
+    \begin{figure}[!hbt]
+    \center
+    \subfigure[content log loss]{\includegraphics[width=0.49\textwidth]{loss/content_log_loss.pdf}}
+    \subfigure[style log loss]{\includegraphics[width=0.49\textwidth]{loss/style_log_loss.pdf}}
+    \subfigure[tv log loss]{\includegraphics[width=0.49\textwidth]{loss/tv_log_loss.pdf}}
+    \subfigure[total log loss]{\includegraphics[width=0.49\textwidth]{loss/total_log_loss.pdf}}
+    \caption{Model training log loss plot}
+    \label{fig:results:vg:logloss}
+    \end{figure}
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \section{More examples}
 
 We also performed a few more experiments with other artistic styles.
