@@ -29,12 +29,13 @@ for (loss_type in names(df_plot)) {
     geom_line() + theme_bw() + xlim(c(0, 1000)) + 
     labs(x = 'number of step', y = paste(loss_type, 'loss')) + 
     theme(panel.background = element_blank())
-  ggsave(paste(loss_type, '_loss.pdf', sep = ''), fig_loss, width = 10, height = 8)
+  ggsave(paste(loss_type, '_loss.pdf', sep = ''), fig_loss, width = 6, height = 5)
   
   # plot log loss curve
   fig_log_loss <- ggplot(data = df, aes(x = Step, y = log_loss)) + 
     geom_line() + theme_bw() + xlim(c(0, 1000)) + 
     labs(x = 'number of step', y = paste(loss_type, 'log loss')) + 
     theme(panel.background = element_blank())
-  ggsave(paste(loss_type, '_log_loss.pdf', sep = ''), fig_log_loss, width = 10, height = 8)
+  ggsave(paste(loss_type, '_log_loss.pdf', sep = ''), fig_log_loss, width = 6, height = 5)
 }
+
