@@ -8,11 +8,54 @@
 \section{Tuning parameters optimization}
 \label{sec:discussion:parameter}
 
+In Sec.\,\ref{sec:implementation:parameters} we presented a pre-defined parameter list.
+For simplicity they are fixed in this work,
+but there is room for improvement in performance with parameter optimization.
+
+\subsection{Loss weighting}
+In the original work \cite{Gatys:2016gj} the authors discussed the trade-off
+between content representation loss and style representation loss.
+Different ratios will lead to various focus on content versus style,
+and the user should be able to adjust the parameter to achieve a more suitable output result
+based on different needs.
 
 
+In this work the ratio of content loss and style loss is set to $10^{-2}$ arbitrarily,
+and according to \cite{Gatys:2016gj} this ratio exerts relatively higher emphasis on content feature extraction,
+therefore the output would resemble the raw input more.
+
+
+The ratio choice would also be reflected on the difference convergence rate of loss function,
+as is shown in Fig.\,~\ref{fig:results:vg:loss}.
+
+\subsection{Convolutional layer selection}
+Different layers can be used for feature extraction.
+Usually convolutional layers and rectified linear units layers are used.
+
+
+Apart from the choice of layer, number of layers can also be adjusted,
+for purpose of faster iteration or more elaborate representation.
+
+\subsection{Gradient descent parameters}
+The Adam optimizer takes four parameters, which are arbitrarily set in this project.
+The topic on the optimizer is beyond the scope of this work,
+and the reader can refer to \cite{kingma2014adam} for more detailed specifications.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Running time optimization}
+\section{Run time optimization}
 
+All output results in this work are generated with a laptop with hardware specifications listed in Sec.\,\ref{sec:intro:spec}.
+Average run time of a single batch of generation is roughly 36000 seconds, or 10 hours.
+
+From the perspective of computing power escalation, common methods include using more CPUs,
+running with GPUs, implementing cloud computing services, or set up parallel computation mechanisms.
+
+As to algorithm optimization, necessary parameter fixation and functionality elimination is required.
+In exchange for higher speed, the user would need to face with higher information loss
+(in both style representation and content representation)
+and more coarse output results.
+
+There have been some works on fast style transfer, among which \cite{engstrom2016faststyletransfer} is an excellent implementation.
+Perceptual loss and quality improvement in fast stylization are also discussed in \cite{Johnson:2016hp, Ulyanov:2016wk}.
