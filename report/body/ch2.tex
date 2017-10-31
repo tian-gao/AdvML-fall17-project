@@ -6,6 +6,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Covolutional neural network}
+\label{sec:foundation:cnn}
 
 
 
@@ -13,6 +14,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{VGG-network}
+\label{sec:foundation:vgg}
 
 
 
@@ -20,3 +22,37 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Loss function}
+\label{sec:foundation:loss}
+
+The total loss consists of three components: content loss, style loss, and total variation loss.
+Of the three, content loss and style loss are also known as pixel loss since
+the Euclidean distances are calculated pixel-wise.
+
+The loss function has the form
+    \begin{equation}
+    \label{eq:loss:total}
+    L_{\text{total}} = \alpha L_{\text{content}} + \beta L_{\text{style}} + \gamma L_{\text{tv}}.
+    \end{equation}
+
+Different choices of the weights for each loss component will lead to different output;
+more commonly, larger $\alpha / \beta$ ratio helps the output graph resemble the original content image more
+while smaller $\alpha / \beta$ ratio emphasizes more on style representation.
+
+In this work we choose $\alpha / \beta = 10^{-2}$.
+More details are discussed in Sec.\ \ref{sec:implementation:parameters} and
+Sec.\ \ref{sec:discussion:parameter}.
+
+
+\subsection{Content loss}
+The content loss measures the $\ell_2$ loss between output graph and the input content image.
+
+
+\subsection{Style loss}
+The style loss measures the $\ell_2$ loss between output graph and the input style image.
+
+
+\subsection{Total variation loss}
+The total variation loss is not a concept proposed in \cite{Gatys:2016gj}.
+In \cite{Johnson:2016hp} total variation loss is added as a regularization method
+in favor of spatial smoothness.
+This is also a common technique used in super-resolution works \cite{aly2005image, zhang2010non}.

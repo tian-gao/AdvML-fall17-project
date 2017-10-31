@@ -28,6 +28,17 @@
 \RequirePackage{subfigure}
 \graphicspath{{figs/}}
 
+% Math Packages
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{latexsym}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{eucal}
+\usepackage{bm}
+
 % Other Packages
 \RequirePackage{fancyhdr}    
 \RequirePackage{lastpage}
@@ -95,6 +106,73 @@
 \let\ps@plain\ps@fancy
 \makeatother
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Math Nomenclatures %%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Theorem Styles
+\theoremstyle{definition} \newtheorem*{Acknowledgement}{Acknowledgement}
+\theoremstyle{plain} \newtheorem{Lemma}{Lemma}
+\theoremstyle{plain} \newtheorem{Theorem}{Theorem}   
+\newenvironment{sol}{\par\noindent{\it\textbf{Solution}}.}{}
+
+\newenvironment{pf}{\par\noindent{\it\textbf{Proof}}.}{\qed}
+
+% Calligraphic Fonts
+\newcommand{\cone}{{\mathds 1}}
+\newcommand{\ca}{{\cal A}}
+\newcommand{\cb}{{\cal B}}
+\newcommand{\cc}{{\cal C}}
+\newcommand{\cd}{{\cal D}}
+\newcommand{\ce}{{\cal E}}
+\newcommand{\cf}{{\cal F}}
+\newcommand{\ch}{{\cal H}}
+\newcommand{\cl}{{\cal L}}
+\newcommand{\cm}{{\cal M}}
+\newcommand{\cp}{{\cal P}}
+\newcommand{\cz}{{\cal Z}}
+
+% Bold Fonts
+\newcommand{\bone}{{\mathbf 1}}
+\newcommand{\bzero}{{\mathbf 0}}
+\newcommand{\bff}{{\mathbf f}}
+\newcommand{\bx}{{\mathbf x}}
+\newcommand{\by}{{\mathbf y}}
+\newcommand{\bX}{{\mathbf X}}
+\newcommand{\bY}{{\mathbf Y}}
+\newcommand{\ba}{{\mathbf A}}
+\newcommand{\be}{{\mathbf e}}
+\newcommand{\bn}{{\mathbf N}}
+\newcommand{\br}{{\mathbf R}}
+\newcommand{\bz}{{\mathbf Z}}
+\newcommand{\blambda}{{\boldsymbol \lambda}}
+\newcommand{\balpha}{{\boldsymbol \alpha}}
+\newcommand{\bbeta}{{\boldsymbol \beta}}
+\newcommand{\beps}{{\boldsymbol \epsilon}}
+\newcommand{\bmu}{{\boldsymbol \mu}}
+
+% Hollow Fonts
+\newcommand{\expe}{{\mathbb E}}
+\newcommand{\real}{{\mathbb R}}
+\newcommand{\dt}{{\Delta t}}
+
+% Arrows
+\newcommand{\ra}{\rightarrow}
+\newcommand{\la}{\leftarrow}
+\newcommand{\Ra}{\Rightarrow}
+\newcommand{\La}{\Leftarrow}
+\newcommand{\LRa}{\Longrightarrow}
+\newcommand{\LLa}{\Longleftarrow}
+
+% Operators
+\newcommand{\ov}{\overline}
+\providecommand{\abs}[1]{\lvert#1\rvert}
+\providecommand{\norm}[1]{\lVert#1\rVert}
+\providecommand{\prob}[1]{\mathbb{P}\{#1\}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%% Codes %%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% code listing
 \RequirePackage{listings}
