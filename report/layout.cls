@@ -98,7 +98,6 @@
         \end{center}
 
         \vfill
-        \normalsize{GR5242 Advanced Machine Learning Final Project} \\
         \normalsize{\@date}
     \end{center}
     \cleardoublepage

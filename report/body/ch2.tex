@@ -5,10 +5,29 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Covolutional neural network}
+\section{Covolutional neural network and rectified linear units}
 \label{sec:foundation:cnn}
 
+One of the most popular topics nowadays in deep learning area is visual perception,
+which includes face recognition, visual cognition, etc.
+Among all sorts of vision models, deep neural network models,
+especially convolutional neural networks (CNN),
+are the most commonly used with due to models' high perceptual quality \cite{Gatys:2015ub, Russakovsky:2015hb, taigman2014deepface}.
 
+Basic principles of CNN are already introduced in class and a lot of other research papers
+thus we will not expand the discussion in this work.
+
+One thing worth mentioning is that there has been a lot of works discussing about activation function selection.
+Common choices include sigmoid function, softmax function (higher dimensional, comparable to sigmoid),
+and one of the most popular, ReLU (rectified linear units).
+Introduced in \cite{nair2010rectified} and \cite{krizhevsky2012imagenet}, ReLU helps speeding training process and
+preserves information while going through layers.
+This property is favorable especially when training large scale neural network,
+and help improve model quality in areas where information preservation is significant, like visual perception.
+
+Similarly, in downsampling mechanisms, different pooling methods may lead to various focus and thus performance.
+In this project we set default pooling method as max pooling,
+while average pooling is also common to use and can be set with certain changes in the code.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -16,7 +35,15 @@
 \section{VGG-network}
 \label{sec:foundation:vgg}
 
+The most time-consuming part of building a neural network lies in model training/fitting stage.
+In order to fit a neural network, one needs huge amount of training data and validation data,
+with high-performance computing units and even parallel computation frameworks,
+which is impossible to implement within a few hours on a personal laptop.
 
+Therefore, like the original work, we utilize a pre-trained neural network model by the Visual Geometry Group (VGG).
+In \cite{Simonyan:2014ws} the authours investigated the impact of CNN depth on large-scale image recognition,
+and they trained a few networks, with number of layers ranging from 16 to 19.
+We utilize the feature space provided by the VGG-network on \cite{vgg}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,11 +71,37 @@ Sec.\ \ref{sec:discussion:parameter}.
 
 
 \subsection{Content loss}
-The content loss measures the $\ell_2$ loss between output graph and the input content image.
+The content loss measures the $\ell_2$ loss between output graph and the input content image:
+
+	\begin{equation}
+	L_{\text{content}}(x, p, l) = \frac{1}{\abs{l}}\sum_{i, j}(x_{ij}^l - p_{ij}^l)^2,
+	\end{equation}
+
+where $p_{ij}$ stands for the original image's feature representation in layer $l$ and
+$x_{ij}$ for the output image,
+and $\abs{l}$ represents the size of the image representation at the layer;
+that is, the content loss function is a normalized Euclidean distance between the
+original image representation and the output image.
 
 
 \subsection{Style loss}
-The style loss measures the $\ell_2$ loss between output graph and the input style image.
+The style loss measures the $\ell_2$ loss between output graph and the input style image but has a more complicated form than of content loss:
+a Gram matrix is constructed to represent the feature correlations through inner product between feature map
+
+	\begin{equation}
+	\begin{aligned}
+	G^l(x) & = F^l \cdot F^{l\prime}, \\
+	E^l(x, a) & = \frac{1}{\abs{l}} \sum_{i, j} (G_{ij}^l(x) - a_{ij}^l)^2, \\
+	L_{\text{style}}(x, a; w) & = \sum_{l} w_l E^l,
+	\end{aligned}
+	\end{equation}
+
+where $F$ is the feature map matrix, $a_{ij}^l$ represents the style image representation at layer $l$,
+$E^l$ represents the style loss at layer $l$ and $w_l$ for loss weight for each layer.
+
+Similar to content loss, the loss on each layer is a normalized Euclidean distance between the style representation
+and output image, and total style loss is the weighted average of individual losses.
+By default we set $w_l = \frac{1}{L}$, where $L$ is the number of layers used for style feature extraction.
 
 
 \subsection{Total variation loss}
@@ -56,3 +109,12 @@ The total variation loss is not a concept proposed in \cite{Gatys:2016gj}.
 In \cite{Johnson:2016hp} total variation loss is added as a regularization method
 in favor of spatial smoothness.
 This is also a common technique used in super-resolution works \cite{aly2005image, zhang2010non}.
+
+The calculation of total variation loss can be represented as
+
+	\begin{equation}
+	L_{\text{tv}} = \sum_{i}^{d_1}\sum_{j}^{d_2}\left[ \frac{1}{d_1} (x_{i+1, j} - x_{i, j})^2 + \frac{1}{d_2} (x_{i, j+1} - x_{i, j})^2 \right].
+	\end{equation}
+
+Essentially the total variation loss is also a type of $\ell_2$ loss, i.e.\ Euclidean distance,
+but between pixels of the image itself so as to measure the overall smoothness.
