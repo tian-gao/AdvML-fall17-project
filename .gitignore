@@ -8,7 +8,6 @@ __pycache__/
 # latex
 *.aux
 *.bbl
-figs/
 
 # specific files
 *.sh
