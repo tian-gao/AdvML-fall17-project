@@ -31,6 +31,19 @@ This project is intended to implement the algorithm described in \cite{Gatys:201
 and build a Python-Tensorflow based artistic style transfer system
 (hereinafter referred to as ``the system'').
 
+One of the biggest differences between this project and other traditional machine learning problems
+is that there is not an objective ``accuracy'' measure on the output results.
+Combining pictures and paintings is a very subjective process,
+and the variation between content and style is adjustable,
+as will be stated in Sec.\ \ref{sec:foundation:loss}.
+
+Therefore, chanllenging parts of the project include:
+    \begin{enumerate}
+        \item Study and parse the large-scale pre-trained deep network data (see Sec.\ \ref{sec:foundation:vgg});
+        \item Process images to fit the network;
+        \item Define very custom loss functions to ``mix'' the content image and style image.
+    \end{enumerate}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -44,9 +57,10 @@ The Prisma app would be a good example.
 The authors of \cite{Gatys:2016gj} founded a website named
 \texttt{DeepArt.io} themselves \cite{wiki:deepart},
 which provides an access for users to upload content and style images.
-Another excellent implementation inspired by the original work
-is by Anish Athalye on GitHub \cite{athalye2015neuralstyle}.
-The work is also Tensorflow-based but with higher complexity and flexibility.
+Another two excellent implementation inspired by the original work
+is by JC Johnson on GitHub \cite{Johnson2015}, which is Lua based,
+and one by Frank Liu \cite{Liu2017}, which is Python based but
+utilizes Sci-Py instead of Tensorflow.
 
 For content representation (content feature extraction) part,
 some works have been done in the area of semantic segmentation with convolutional neural network,

@@ -1,4 +1,3 @@
-
 import numpy as np
 import scipy.misc
 from PIL import Image
@@ -17,10 +16,7 @@ def unprocess_image(input_image, mean_pixel):
 def read_image(image_name):
     logger.info('Reading image: {}'.format(image_name.split('/')[-1]))
     img = scipy.misc.imread(image_name).astype(np.float)
-    if len(img.shape) == 2:   # grayscale
-        img = np.dstack((img, img, img))
-    elif img.shape[2] == 4:   # PNG with alpha channel
-        img = img[:, :, :3]
+    img = img[:, :, :3]
     return img
 
 
