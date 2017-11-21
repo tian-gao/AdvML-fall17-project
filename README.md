@@ -1,4 +1,4 @@
-Artistic style transfer implementation with Tensorflow
+## Artistic style transfer implementation with Tensorflow
 
 This project is intended to be the course final project for Columbia University GR5242 Advanced Machine Learning.
 
