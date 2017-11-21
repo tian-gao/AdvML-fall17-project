@@ -43,8 +43,6 @@ class VGG(object):
 
     def _get_conv_layer(self, input_image, input_layer):
         # get kernel and bias
-        # matconvnet: weights are [width, height, in_channels, out_channels]
-        # tensorflow: weights are [height, width, in_channels, out_channels]
         kernels, bias = input_layer[0][0][0][0]
         kernels = np.transpose(kernels, (1, 0, 2, 3))
         bias = bias.reshape(-1)

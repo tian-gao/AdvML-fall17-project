@@ -11,11 +11,11 @@ VGG19_LAYERS = (
     'relu4_3', 'conv4_4', 'relu4_4', 'pool4',
 
     'conv5_1', 'relu5_1', 'conv5_2', 'relu5_2', 'conv5_3',
-    'relu5_3', 'conv5_4', 'relu5_4'
+    'relu5_3', 'conv5_4', 'relu5_4', 'pool5',
 )
 
 # input image layer mapping
-CONTENT_LAYERS = ('relu4_2', 'relu5_2')
+CONTENT_LAYERS = ('relu4_2')
 STYLE_LAYERS = ('relu1_1', 'relu2_1', 'relu3_1', 'relu4_1', 'relu5_1')
 
 # default parameters

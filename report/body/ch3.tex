@@ -76,14 +76,12 @@ Apart from model parameters, neural network choice in this work is also differen
 	\begin{tabular}{c|c|l}
 	\hline
 	& & \multicolumn{1}{c}{layers used} \\ \hline
-	\multirow{3}{*}{content representation}
+	\multirow{2}{*}{content representation}
 		& this work & relu4\_2 \\
 		& original work & conv1\_1, conv4\_2 \\
-		& Anish work & relu4\_2, relu5\_2 (weight adjustable) \\ \hline
-	\multirow{3}{*}{style representation}
+	\multirow{2}{*}{style representation}
 		& this work & relu1\_1, relu2\_1, relu3\_1, relu4\_1, relu5\_1 \\
 		& original work & conv1\_1, conv2\_1, conv3\_1, conv4\_1, conv5\_1 \\
-		& Anish work & relu1\_1, relu2\_1, relu3\_1, relu4\_1, relu5\_1 \\
 	\hline
 	\end{tabular}
 	\caption{Pre-defined feature extraction layers}

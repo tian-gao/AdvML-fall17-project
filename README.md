@@ -1,4 +1,4 @@
-## Artistic style transfer implementation with Tensorflow
+Artistic style transfer implementation with Tensorflow
 
 This project is intended to be the course final project for Columbia University GR5242 Advanced Machine Learning.
 
@@ -57,16 +57,11 @@ This repository also includes a `report` folder which contains the full project 
 
 This project is inspired by the [paper][paper] on style transfer.
 
-An excellent implementation is provided by Anish Athalye [here][reference]. Some of the code in this project are borrowed from the repository with re-factoring, re-structuring, and re-encapsulation.
-
 ### Acknowledgement
 
 Thanks to the authors of the [paper][paper], who had such interesting ideas and inspired this work.
 
-Thanks to [Anish][reference], who did a great work implementing the idea. 
-
 [email]: mailto:tian.gao@columbia.edu
 [paper]: http://arxiv.org/pdf/1508.06576v2.pdf
 [data]: http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat
-[reference]: https://github.com/anishathalye/neural-style
 

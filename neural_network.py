@@ -32,7 +32,6 @@ class NeuralNetwork(object):
         # get content layer weights
         content_layer_weights = {}
         content_layer_weights['relu4_2'] = 1.0
-        content_layer_weights['relu5_2'] = 0.0
 
         # get style layer weights
         style_layer_weights = {}
