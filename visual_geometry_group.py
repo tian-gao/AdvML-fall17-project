@@ -38,7 +38,6 @@ class VGG(object):
                 current_image = self._get_pool_layer(current_image)
             parsed_net[layer_name] = current_image
 
-        assert len(parsed_net) == len(VGG19_LAYERS)
         return parsed_net
 
     def _get_conv_layer(self, input_image, input_layer):

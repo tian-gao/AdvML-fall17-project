@@ -132,7 +132,6 @@ class NeuralNetwork(object):
         # get content layer weights
         content_layer_weights = {}
         content_layer_weights['relu4_2'] = 1.0
-        content_layer_weights['relu5_2'] = 0.0
 
         # get style layer weights
         style_layer_weights = {}
@@ -311,13 +310,10 @@ class VGG(object):
                 current_image = self._get_pool_layer(current_image)
             parsed_net[layer_name] = current_image
 
-        assert len(parsed_net) == len(VGG19_LAYERS)
         return parsed_net
 
     def _get_conv_layer(self, input_image, input_layer):
         # get kernel and bias
-        # matconvnet: weights are [width, height, in_channels, out_channels]
-        # tensorflow: weights are [height, width, in_channels, out_channels]
         kernels, bias = input_layer[0][0][0][0]
         kernels = np.transpose(kernels, (1, 0, 2, 3))
         bias = bias.reshape(-1)
